@@ -161,7 +161,7 @@ namespace WeDidItReplit
                 }
                 else
                 {
-                    Console.WriteLine("The string is not valid! Please try again.");
+                    Console.WriteLine("The input is not valid! Please try again.");
                     break;
                 }
             }
