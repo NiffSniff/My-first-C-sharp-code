@@ -1,110 +1,169 @@
 using System;
-
 namespace WeDidItReplit
 {
     class Program
     {
-        static void OperandValidation(string Calc, ref long x, ref long y, ref char op, ref bool ok)
+        static bool IsValid (string Calc)
         {
-            if (Calc.Length < 5 || Calc[1] != ' ') // checking if the string is long enough to have 2 operands and an operation with spaces in between
-            {
-                ok = false;
-            }
-            else
-            {
-                op = Calc[0];
-            }
+            string Operations = "+-*/%^"; // all the available operations
+            bool IsASymbol = false, AfterFirstOperand = false;
 
-            int i;
-            for (i = 2; i < Calc.Length && Calc[i] != ' '; i++)
+
+
+            if (Calc.Length < 5 || Calc[1] != ' ') // checks for the first space and the minimum length
+                return false;
+
+            
+            for (int i = 0; i<Operations.Length; i++) // checks if the operation is valid
             {
-                if (Calc[i] < '0' || Calc[i] > '9') // checking if the string contains characters different from digits
+                if (Operations[i] == Calc[0])
                 {
-                    ok = false;
+                    IsASymbol = true;
                     break;
                 }
-
-                x = x * 10 + (int)Calc[i] - 48; // manual conversion from string to int
+            }
+            if (IsASymbol == false)
+            {
+                return false;
             }
 
-            if (i == Calc.Length)
-                ok = false;
-            else for (int j = i + 1; j < Calc.Length; j++)
-                 {
-                    if (Calc[j] < '0' || Calc[j] > '9') // if the string contains characters different from digits
-                    {
-                        ok = false;
-                        break;
-                    }
-
-                    y = y * 10 + (int)Calc[j] - 48; // manual conversion from string to int
-                 }
-        }
-        
-        static void Solve(long X, long Y, char op, ref double Ans, ref bool ok)
-        {
-            if (op == '+') // addition
+            for (int i = 2; i<Calc.Length; i++)
             {
-                Ans = X + Y;
-            }
-            else if (op == '-') // substraction
-            {
-                Ans = X - Y;
-            }
-            else if (op == '*') // multiplication
-            {
-                Ans = X * Y;
-            }
-            else if (op == '/') // division
-            {
-                Ans = X * 1.0 / Y;
-            }
-            else if (op == '%') // modulus
-            {
-                Ans = X % Y;
-            }
-            else if (op == '^') // power
-            {
-                long x = X;
-                while (Y != 1)
+                if (Calc[i] == ' ') // checks if a space is supposed to be there
                 {
-                    Y--;
-                    X *= x;
+                    if (AfterFirstOperand == false)
+                    {
+                        AfterFirstOperand = true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                Ans = X;
+                else if (Calc[i] == '-') // checking if the dash is the first component of an operand (if it's part of a negative number or an invalid character)
+                {
+                    if (Calc[i-1] != ' ')
+                        return false;
+                }
+                else if (Calc[i] < '0' || Calc[i] > '9') // checks if the numbers have characters in them
+                {
+                    return false;
+                }
             }
-            else // checking if the requested operation is implemented or not
+            if (AfterFirstOperand == false || Calc[Calc.Length-1] == ' ') // if the second operand exists
             {
-                ok = false;
+                return false;
             }
+
+
+            return true;
         }
+
+
+
+        static long FirstOperand(string Calc) // extracting the first operand from the string
+        {
+            long x = 0;
+            int sign = 1, i = 2;
+            if (Calc[2] == '-')
+            {
+                sign = -1;
+                i++;
+            }
+            for (; Calc[i] != ' '; i++)
+            {
+                x = x * 10 + Calc[i] - 48;
+            }
+            return x * sign;
+        }
+
+
+
+        static long SecondOperand(string Calc) // extracting the second operand from the string
+        {
+            long x = 0;
+            int i = 2, sign = 1;
+            while (Calc[i] != ' ') // skipping to the second blank (the one that separates the first from the second operand)
+                i++;
+            i++;
+            if (Calc[i] == '-')
+            {
+                sign = -1;
+                i++;
+            }
+            while (i < Calc.Length)
+            {
+                x = x * 10 + Calc[i] - 48;
+                i++;
+            }
+            return x * sign;
+        }
+
+
+
+        static double Answer(long op1, long op2, char sign) // The result of the equation
+        {
+            if (sign == '+')
+            {
+                return op1 + op2;
+            }
+            else if (sign == '-')
+            {
+                return op1 - op2;
+            }
+            else if (sign == '*')
+            {
+                return op1 * op2;
+            }
+            else if (sign == '/')
+            {
+                return op1 * 1.0 / op2;
+            }
+            else if (sign == '%')
+            {
+                return op1 % op2;
+            }
+            else if (sign == '^')
+            {
+                double x = 1;
+                while (op2 > 0)
+                {
+                    x *= op1;
+                    op2--;
+                }
+                while (op2 < 0)
+                {
+                    x /= op1;
+                    op2++;
+                }
+                return x;   
+            }
+            return 0;
+        }
+
+
 
         static void Main(string[] args)
         {
-            bool IsValid = false;
-
-            while (IsValid == false) // checking if the input is valid
+            bool ok = false;
+            while (ok == false) // the program will keep requesting input until it's valid
             {
-                IsValid = true;
-                char Operation = '0';
-                long FirstOperand = 0, SecondOperand = 0;
-                double Result = 0;
-                string Calc = Console.ReadLine(), Message = "0"; // reading everything in one string
+                long op1, op2;
 
-                OperandValidation(Calc, ref FirstOperand, ref SecondOperand, ref Operation, ref IsValid); // convert the string characters into the operands
-                Solve(FirstOperand, SecondOperand, Operation, ref Result, ref IsValid); // solving the equation (if possible)
+                string Calc = Console.ReadLine(); // reading everything in one string
 
-
-                if (IsValid == false)
+                if (IsValid(Calc))
                 {
-                    Message = "Invalid input, please try again: \n";
-                    Console.WriteLine(Message);
+                    ok = true; // ensures it exits the cycle if the input is valid
+                    op1 = FirstOperand(Calc);
+                    op2 = SecondOperand(Calc);
+                    Console.WriteLine("The Answer is: " + Answer(op1,op2,Calc[0])); // Calc[0] represents the operator
                 }
                 else
                 {
-                    Console.WriteLine(Result);
+                    Console.WriteLine("The string is not valid! Please try again.");
+                    break;
                 }
-
             }
         }
     }
