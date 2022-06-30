@@ -1,105 +1,60 @@
 using System;
 namespace WeDidItReplit
 {
-    class Program
+    internal class Program
     {
-        static bool IsValid (string Calc)
+        //static bool IsValid(string Arguments)
+        //{
+        //    string Operations = "+-*/%^"; // all the available operations
+        //    bool IsASymbol = false, AfterFirstOperand = false;
+
+
+
+        //    if (Arguments.Length < 5 || Arguments[1] != ' ') // checks for the first space and the minimum length
+        //        return false;
+
+        //    IsASymbol = CheckIfOperatorIsValid(Arguments, Operations, IsASymbol);
+        //    if (IsASymbol == false)
+        //    {
+        //        return false;
+        //    }
+
+        //    for (int i = 2; i < Arguments.Length; i++)
+        //    {
+        //        if (Arguments[i] == ' ') // checks if a space is supposed to be there
+        //        {
+        //            if (AfterFirstOperand == false)
+        //            {
+        //                AfterFirstOperand = true;
+        //            }
+        //            else
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //        else if (Arguments[i] == '-') // checking if the dash is the first component of an operand (if it's part of a negative number or an invalid character)
+        //        {
+        //            if (Arguments[i - 1] != ' ')
+        //                return false;
+        //        }
+        //        else if (Arguments[i] < '0' || Arguments[i] > '9') // checks if the numbers have characters in them
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    if (AfterFirstOperand == false || Arguments[Arguments.Length - 1] == ' ') // if the second operand exists
+        //    {
+        //        return false;
+        //    }
+
+
+        //    return true;
+        //}
+
+        private static bool CheckIfOperatorIsValid(string operand, out long operandValue)
         {
-            string Operations = "+-*/%^"; // all the available operations
-            bool IsASymbol = false, AfterFirstOperand = false;
-
-
-
-            if (Calc.Length < 5 || Calc[1] != ' ') // checks for the first space and the minimum length
-                return false;
-
-            
-            for (int i = 0; i<Operations.Length; i++) // checks if the operation is valid
-            {
-                if (Operations[i] == Calc[0])
-                {
-                    IsASymbol = true;
-                    break;
-                }
-            }
-            if (IsASymbol == false)
-            {
-                return false;
-            }
-
-            for (int i = 2; i<Calc.Length; i++)
-            {
-                if (Calc[i] == ' ') // checks if a space is supposed to be there
-                {
-                    if (AfterFirstOperand == false)
-                    {
-                        AfterFirstOperand = true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else if (Calc[i] == '-') // checking if the dash is the first component of an operand (if it's part of a negative number or an invalid character)
-                {
-                    if (Calc[i-1] != ' ')
-                        return false;
-                }
-                else if (Calc[i] < '0' || Calc[i] > '9') // checks if the numbers have characters in them
-                {
-                    return false;
-                }
-            }
-            if (AfterFirstOperand == false || Calc[Calc.Length-1] == ' ') // if the second operand exists
-            {
-                return false;
-            }
-
-
-            return true;
+            return long.TryParse(operand, out operandValue);
         }
-
-
-
-        static long FirstOperand(string Calc) // extracting the first operand from the string
-        {
-            long x = 0;
-            int sign = 1, i = 2;
-            if (Calc[2] == '-')
-            {
-                sign = -1;
-                i++;
-            }
-            for (; Calc[i] != ' '; i++)
-            {
-                x = x * 10 + Calc[i] - 48;
-            }
-            return x * sign;
-        }
-
-
-
-        static long SecondOperand(string Calc) // extracting the second operand from the string
-        {
-            long x = 0;
-            int i = 2, sign = 1;
-            while (Calc[i] != ' ') // skipping to the second blank (the one that separates the first from the second operand)
-                i++;
-            i++;
-            if (Calc[i] == '-')
-            {
-                sign = -1;
-                i++;
-            }
-            while (i < Calc.Length)
-            {
-                x = x * 10 + Calc[i] - 48;
-                i++;
-            }
-            return x * sign;
-        }
-
-
 
         static double Answer(long op1, long op2, char sign) // The result of the equation
         {
@@ -136,7 +91,7 @@ namespace WeDidItReplit
                     x /= op1;
                     op2++;
                 }
-                return x;   
+                return x;
             }
             return 0;
         }
@@ -151,20 +106,31 @@ namespace WeDidItReplit
                 long op1, op2;
 
                 string Calc = Console.ReadLine(); // reading everything in one string
-
-                if (IsValid(Calc))
-                {
-                    ok = true; // ensures it exits the cycle if the input is valid
-                    op1 = FirstOperand(Calc);
-                    op2 = SecondOperand(Calc);
-                    Console.WriteLine("The Answer is: " + Answer(op1,op2,Calc[0])); // Calc[0] represents the operator
-                }
-                else
+                var operatorAndOperands = Calc.Split(' ');
+                var operation = operatorAndOperands[0];
+                if (!CheckIfOperationIsValid(operation))
                 {
                     Console.WriteLine("The input is not valid! Please try again.");
-                    break;
+                    continue;
                 }
+                if (!CheckIfOperatorIsValid(operatorAndOperands[1], out op1))
+                {
+                    Console.WriteLine("The input is not valid! Please try again.");
+                    continue;
+                }
+                if (!CheckIfOperatorIsValid(operatorAndOperands[2], out op2))
+                {
+                    Console.WriteLine("The input is not valid! Please try again.");
+                    continue;
+                }
+                ok = true;
+                Console.WriteLine("The Answer is: " + Answer(op1, op2, Calc[0]));
             }
+        }
+
+        private static bool CheckIfOperationIsValid(string operation)
+        {
+            throw new NotImplementedException();
         }
     }
 }
