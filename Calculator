@@ -3,54 +3,6 @@ namespace WeDidItReplit
 {
     internal class Program
     {
-        //static bool IsValid(string Arguments)
-        //{
-        //    string Operations = "+-*/%^"; // all the available operations
-        //    bool IsASymbol = false, AfterFirstOperand = false;
-
-
-
-        //    if (Arguments.Length < 5 || Arguments[1] != ' ') // checks for the first space and the minimum length
-        //        return false;
-
-        //    IsASymbol = CheckIfOperatorIsValid(Arguments, Operations, IsASymbol);
-        //    if (IsASymbol == false)
-        //    {
-        //        return false;
-        //    }
-
-        //    for (int i = 2; i < Arguments.Length; i++)
-        //    {
-        //        if (Arguments[i] == ' ') // checks if a space is supposed to be there
-        //        {
-        //            if (AfterFirstOperand == false)
-        //            {
-        //                AfterFirstOperand = true;
-        //            }
-        //            else
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //        else if (Arguments[i] == '-') // checking if the dash is the first component of an operand (if it's part of a negative number or an invalid character)
-        //        {
-        //            if (Arguments[i - 1] != ' ')
-        //                return false;
-        //        }
-        //        else if (Arguments[i] < '0' || Arguments[i] > '9') // checks if the numbers have characters in them
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    if (AfterFirstOperand == false || Arguments[Arguments.Length - 1] == ' ') // if the second operand exists
-        //    {
-        //        return false;
-        //    }
-
-
-        //    return true;
-        //}
-
         private static bool CheckIfOperatorIsValid(string operand, out long operandValue)
         {
             return long.TryParse(operand, out operandValue);
@@ -104,33 +56,30 @@ namespace WeDidItReplit
             while (ok == false) // the program will keep requesting input until it's valid
             {
                 long op1, op2;
-
                 string Calc = Console.ReadLine(); // reading everything in one string
+                string ErrorMessage = "The input is not valid! Please try again.\n";
                 var operatorAndOperands = Calc.Split(' ');
-                var operation = operatorAndOperands[0];
-                if (!CheckIfOperationIsValid(operation))
+                
+                if (operatorAndOperands.Length != 3) // check if the input is structured with 3 components separated through blanks
                 {
-                    Console.WriteLine("The input is not valid! Please try again.");
+                    Console.WriteLine(ErrorMessage);
                     continue;
                 }
-                if (!CheckIfOperatorIsValid(operatorAndOperands[1], out op1))
+                if (!CheckIfOperationIsValid(operatorAndOperands[0]) || !CheckIfOperatorIsValid(operatorAndOperands[1], out op1) || !CheckIfOperatorIsValid(operatorAndOperands[2], out op2))
                 {
-                    Console.WriteLine("The input is not valid! Please try again.");
-                    continue;
-                }
-                if (!CheckIfOperatorIsValid(operatorAndOperands[2], out op2))
-                {
-                    Console.WriteLine("The input is not valid! Please try again.");
-                    continue;
+                    Console.WriteLine(ErrorMessage);
+                    continue; // skips Lines 72 and 73 and, since ok remains false, maintains the loop, requesting input again
                 }
                 ok = true;
-                Console.WriteLine("The Answer is: " + Answer(op1, op2, Calc[0]));
+                char operation = operatorAndOperands[0][0];
+                Console.WriteLine("The Answer is: " + Answer(op1, op2, operation));
             }
-        }
 
+        }
         private static bool CheckIfOperationIsValid(string operation)
         {
-            throw new NotImplementedException();
+            string s = "+-*/%^";
+            return operation.Length == 1 && s.IndexOf(operation) >= 0;
         }
     }
 }
